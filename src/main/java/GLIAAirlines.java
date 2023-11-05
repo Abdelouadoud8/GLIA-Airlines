@@ -2,6 +2,7 @@ import org.chocosolver.solver.Model;
 import org.chocosolver.solver.variables.IntVar;
 import org.chocosolver.solver.variables.SetVar;
 import java.util.ArrayList;
+import java.util.List;
 
 
 import static org.chocosolver.solver.search.strategy.Search.minDomLBSearch;
@@ -51,9 +52,42 @@ public class GLIAAirlines {
 
 
 		//--------------- Constraint 2: Ensure dividers don't occupy exit positions ---------------//
-		for (int exit : inst.exits) {
+		/* for (int exit : inst.exits) {
 			model.arithm(dividers[0], "!=", exit).post();
+		}*/
+
+		if (inst.exits.length == 1) {
+			for (int i = 0; i < inst.nb_dividers - 1; i++) {
+				for (int exit : inst.exits) {
+					model.arithm(dividers[i], "!=", exit).post();
+				}
+			}
+
+		} else {
+			List<Integer> unobstructedExits = new ArrayList<>();
+			for (int exit : inst.exits) {
+				boolean isObstructed = false;
+				for (IntVar dividerPos : dividers) {
+					if (dividerPos.getValue() == exit) {
+						isObstructed = true;
+						break;
+					}
+				}
+				if (!isObstructed) {
+					unobstructedExits.add(exit);
+				}
+			}
+
+			// Ensure at least one exit remains unobstructed
+			if (!unobstructedExits.isEmpty()) {
+				int chosenExit = unobstructedExits.get(0);
+				for (IntVar dividerPos : dividers) {
+					model.arithm(dividerPos, "!=", chosenExit).post();
+				}
+			}
 		}
+
+
 
 
 		//---------- Constraint 3: Fix the first and the last dividers in the beginning and end of the plane ----------//

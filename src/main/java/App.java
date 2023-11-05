@@ -11,7 +11,7 @@ import org.apache.commons.cli.ParseException;
 public class App 
 {
 	
-	private static Instance inst = Instance.inst5;
+	private static Instance inst = Instance.inst7;
 	private static long timeout = 300000; // five minutes
 	private static boolean allSolutions;
 
